@@ -1183,7 +1183,6 @@ function createDuplicates(targetLayer, number){
             }
         }
     }
-    // $.writeln(dupLayers);
     return(dupLayers);
 }
 
@@ -1349,8 +1348,6 @@ Group.prototype.setState = function(state){
     this.setBG([[.25,.25,.25], [1, 0.58, 0.0]][Number(this.state)])
 }
 
-
-
 //just a long string containing the control expression
 
 this.expressions = {
@@ -1364,7 +1361,7 @@ this.expressions = {
 
     rot3D: "cntrl = thisComp.layer(" + '"' + this.texts.nullControlName3D + '"' +");\nvalue+[transform.xRotation, transform.yRotation, transform.zRotation] + recursiveRotation(cntrl, cntrl.transform.orientation+[cntrl.transform.xRotation, cntrl.transform.yRotation, cntrl.transform.zRotation])\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\ttry{\n\t\t\treturn recursiveRotation(layer.parent,rot+=([layer.parent.transform.xRotation, layer.parent.transform.yRotation, layer.parent.transform.zRotation]+layer.parent.transform.orientation));\n\t\t}\n\t\tcatch(err){\n\t\t\treturn recursiveRotation(layer.parent,rot+=([0, 0, layer.parent.transform.rotation]));\n\t\t}\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}",
 
-    rotCirc: "try{\nc = thisComp.layer(" + '"' + this.texts.nullControlNameCirc + '"' +");\n\nrecursiveRotation(c, c.transform.rotation)\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\treturn recursiveRotation(layer.parent,rot+=layer.parent.rotation);\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}\n}catch(err){value}",
+    rotCirc: "try{\nc = thisComp.layer(" + '"' + this.texts.nullControlNameCirc + '"' +");\n\nrecursiveRotation(c, c.transform.rotation) + ((c.index-(index-1))*c.effect(2)(1))\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\treturn recursiveRotation(layer.parent,rot+=layer.parent.rotation);\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}\n}catch(err){value}",
 }
 /*
 //Custom effect for grid control
