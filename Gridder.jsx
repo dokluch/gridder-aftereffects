@@ -1056,11 +1056,11 @@ function bakeExpressions(thisObj){
             curLayer.position.setValue(activeComp.layers[i].transform.position.value);
             curLayer.position.expression = '';
 
-            if(thisObj.gridMode!="3D"){
+            try{
                 curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
                 curLayer.rotation.expression = '';
             }
-            else{
+            catch(err){
                 curLayer.orientation.setValue(activeComp.layers[i].orientation.value);
                 curLayer.orientation.expression = '';
             }
