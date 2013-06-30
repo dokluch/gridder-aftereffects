@@ -583,8 +583,6 @@ function buildGUI(thisObj){
 
             duplicatorBttn.enabled = true;
             gridOverlayBttn.enabled = true;
-            createExpr.enabled = true;
-            bakeExpr.enabled = true;
 
         }
         else if(thisObj.gridMode == "3D"){
@@ -598,8 +596,7 @@ function buildGUI(thisObj){
 
             duplicatorBttn.enabled = true;
             gridOverlayBttn.enabled = false;
-            createExpr.enabled = false;
-            bakeExpr.enabled = false;
+
         }
         else{
             twoDmodeGroup.visible = false;
@@ -612,8 +609,7 @@ function buildGUI(thisObj){
 
             duplicatorBttn.enabled = false;
             gridOverlayBttn.enabled = false;
-            createExpr.enabled = true;
-            bakeExpr.enabled = true;
+
         }
     }
 
@@ -815,6 +811,10 @@ function buildGUI(thisObj){
     else thisObj.w.layout.layout(true);
 }
 
+//==================================
+//Create expressions
+//==================================
+
 function createExpressions(thisObj){
     var activeComp = app.project.activeItem;
 
@@ -829,6 +829,9 @@ function createExpressions(thisObj){
                 return (a.index - b.index);
             });
 
+            //======================
+            //Rectangle mode
+            //======================
 
             if(thisObj.gridMode == "RECT"){
 
@@ -847,6 +850,7 @@ function createExpressions(thisObj){
                     thisObj.nullControl.moveBefore(selLayers[0]);
 
                     thisObj.nullControl.name = thisObj.texts.nullControlName;
+
                     var stepXControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
                     stepXControl.name = "Colums";
 
@@ -902,9 +906,95 @@ function createExpressions(thisObj){
                 }
             }
 
+            //======================
+            //3D mode
+            //======================
+
             else if(thisObj.gridMode == "3D"){
-                null;
+                var nullExists = false
+                for(var i = 1; i<=activeComp.layers.length;i++){
+                    if(activeComp.layers[i].name == thisObj.texts.nullControlName3D){
+                        var nullControl = activeComp.layers[i];
+                        nullExists = true;
+                    }
+                }
+                
+                if(nullExists == false){
+                    thisObj.nullControl = activeComp.layers.addNull(activeComp.duration)
+                    thisObj.nullControl.label = 13;
+
+                    thisObj.nullControl.threeDLayer = true;
+
+                    thisObj.nullControl.moveBefore(selLayers[0]);
+
+                    thisObj.nullControl.name = thisObj.texts.nullControlName3D;
+                    var stepXControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
+                    stepXControl.name = "Colums";
+
+                    var stepYControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
+                    stepYControl.name = "Rows";
+                    
+                    var XYChckbx = thisObj.nullControl("Effects").addProperty("ADBE Checkbox Control");
+                    XYChckbx.name = "XY";
+
+                    var XZChckbx = thisObj.nullControl("Effects").addProperty("ADBE Checkbox Control");
+                    XZChckbx.name = "XZ";
+
+                    var YZChckbx = thisObj.nullControl("Effects").addProperty("ADBE Checkbox Control");
+                    YZChckbx.name = "YZ";
+
+                    var spacingXControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
+                    spacingXControl.name = "Spacing X";
+
+                    var spacingYControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
+                    spacingYControl.name = "Spacing Y";
+
+                    var spacingZControl = thisObj.nullControl("Effects").addProperty("ADBE Slider Control");
+                    spacingZControl.name = "Spacing Z";
+
+                    var sqGridControl = thisObj.nullControl("Effects").addProperty("ADBE Checkbox Control");
+                    sqGridControl.name = "Square Grid";
+
+                    //set expresions
+                    thisObj.nullControl.effect(1).slider.expression = "if(value==0) value = 1 else value";
+                    thisObj.nullControl.effect(2).slider.expression = "if(value==0) value = 1 else value";
+
+                    thisObj.nullControl.effect(3).checkbox.expression = "if(effect(4)(1) == true) false else value";
+                    thisObj.nullControl.effect(4).checkbox.expression = "if(effect(3)(1) == true) false else value";
+                    thisObj.nullControl.effect(5).checkbox.expression = "if(effect(3)(1) == true) false else value";
+
+                    thisObj.nullControl.effect(6).slider.expression = "if(effect(7)(1) == true) effect(5)(1) else value";
+                }
+
+                //set slider values
+                thisObj.nullControl.effect(1).slider.setValue(thisObj.numCols);
+                thisObj.nullControl.effect(2).slider.setValue(thisObj.numRows);
+
+                for(var i = 0; i <= 2; i++){
+                    if(thisObj.planeSelect == i){
+                        thisObj.nullControl.effect(3+i).checkbox.setValue(true);
+                    }
+                    else thisObj.nullControl.effect(3+i).checkbox.setValue(false);
+                }
+
+                thisObj.nullControl.effect(6).slider.setValue(thisObj.xSpacing);
+                thisObj.nullControl.effect(7).slider.setValue(thisObj.ySpacing);
+                thisObj.nullControl.effect(8).slider.setValue(thisObj.zSpacing);
+
+                thisObj.nullControl.effect(9).checkbox.setValue(thisObj.sqGrid);
+
+                thisObj.nullControl.transform.position.setValue([selLayers[0].transform.position.value[0],selLayers[0].transform.position.value[1]]);
+                for(var i = 0; i<selLayers.length; i++){
+                    //set expressions for selected layers
+                    selLayers[i].position.expression = thisObj.expressions.pos3D;
+                    selLayers[i].orientation.expression = thisObj.expressions.rot3D;
+                }
             }
+
+            //======================
+            //Circular mode
+            //======================
+
             else if(thisObj.gridMode == "CIRC"){
                 var nullExists = false
                 for(var i = 1; i<=activeComp.layers.length;i++){
@@ -953,17 +1043,28 @@ function createExpressions(thisObj){
     app.endUndoGroup();
 }
 
+//==================================
+//Bake expressions
+//==================================
+
 function bakeExpressions(thisObj){
     app.beginUndoGroup("Baking expressions")
     var activeComp = app.project.activeItem;
     for(var i = 1; i<=activeComp.layers.length;i++){
         var curLayer = activeComp.layers[i].transform;
-        if(curLayer.position.expression == thisObj.expressions.pos2D || curLayer.position.expression == thisObj.expressions.posCirc){
+        if(curLayer.position.expression == thisObj.expressions.pos2D || curLayer.position.expression == thisObj.expressions.pos3D || curLayer.position.expression == thisObj.expressions.posCirc){
             curLayer.position.setValue(activeComp.layers[i].transform.position.value);
             curLayer.position.expression = '';
 
-            curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
-            curLayer.rotation.expression = '';
+            if(thisObj.gridMode!="3D"){
+                curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
+                curLayer.rotation.expression = '';
+            }
+            else{
+                curLayer.orientation.setValue(activeComp.layers[i].orientation.value);
+                curLayer.orientation.expression = '';
+            }
+            
         }
     }
 
@@ -1255,7 +1356,7 @@ Group.prototype.setState = function(state){
 this.expressions = {
     pos2D : "try{\ncntrl = thisComp.layer(" + '"' + this.texts.nullControlName+ '"' +");\nstepX = Math.floor(cntrl.effect(1)(1));\nstepY = Math.floor(cntrl.effect(2)(1));\nspacingX = cntrl.effect(5)(1);\nspacingY = cntrl.effect(6)(1);\nsqGrid = cntrl.effect(7)(1);\nonlyCols = cntrl.effect(3)(1);\nonlyRows = cntrl.effect(4)(1);\nthisIndex = index - (1+cntrl.index);\na = degreesToRadians(recursiveRotation(cntrl,cntrl.transform.rotation));\n\nif(onlyRows == 0){\n\tif(onlyCols == 0){\n\t\tthisIndex = thisIndex%(stepX*stepY);\n\t}\n\tthisCol = thisIndex%stepX;\n\tthisRow = Math.floor(thisIndex/stepX);\n\tpos = [spacingX*thisCol, spacingY*thisRow];\n}\nelse{\n\tthisCol = thisIndex%stepY;\n\tthisRow = Math.floor(thisIndex/stepY);\n\tpos = [spacingX*thisRow, spacingY*thisCol];\n}\n\tpos = [pos[0]*cntrl.transform.scale[0]/100, pos[1]*cntrl.transform.scale[1]/100]\n\ncntrl.toComp(cntrl.transform.anchorPoint)+[pos[0]*Math.cos(a)-pos[1]*Math.sin(a), pos[0]*Math.sin(a)+pos[1]*Math.cos(a)]\n}\ncatch(err){value}\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\treturn recursiveRotation(layer.parent,rot+=layer.parent.rotation);\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}",
 
-    pos3D: "",
+    pos3D: "cntrl = thisComp.layer(" + '"' + this.texts.nullControlName3D+ '"' +");\nstepX = Math.floor(cntrl.effect(1)(1));\nstepY = Math.floor(cntrl.effect(2)(1));XY = cntrl.effect(3)(1);\nXZ = cntrl.effect(4)(1);\nYZ = cntrl.effect(5)(1);\nspacingX = cntrl.effect(6)(1);\nspacingY = cntrl.effect(7)(1);\nspacingZ = cntrl.effect(8)(1);\nsqGrid = cntrl.effect(9)(1);\n\nthisIndex = index - (1+cntrl.index);\na = recursiveRotation(cntrl,cntrl.transform.orientation + [cntrl.transform.xRotation, cntrl.transform.yRotation, cntrl.transform.zRotation]);\n\nthisZ = Math.floor(thisIndex/(stepX*stepY));\nthisIndex = thisIndex%(stepX*stepY);\nthisX = thisIndex%stepX;\nthisY = Math.floor(thisIndex/stepX);\n\npV = [thisX, thisY, thisZ];\nif(XY == true) pV = [thisX, thisY, thisZ];\nif(XZ == true) pV = [thisZ, thisY, thisX];\nif(YZ == true) pV = [thisX, thisZ, thisY];\n\npos = [spacingX*pV[0], spacingY*pV[1], spacingZ*pV[2]];\n\nx = a[0];\ny = -1*a[1];\nz = a[2];\n\nx1 = pos[0]*cos(y)*cos(z) - pos[1]*cos(y)*sin(z) - pos[2]*sin(y);\ny1 = pos[0]*(-1*sin(x)*sin(y)*cos(z) + cos(x)*sin(z)) + pos[1]*(sin(x)*sin(y)*sin(z) + cos(x)*cos(z)) - pos[2]*(sin(x)*cos(y)); \nz1 = pos[0]*(cos(x)*sin(y)*cos(z) + sin(x)*sin(z)) + pos[1]*(-1*cos(x)*sin(y)*sin(z) + sin(x)*cos(z)) + pos[2]*(cos(x)*cos(y));\n\nrecursivePosition(cntrl,cntrl.transform.position)+[x1,y1,z1];\n\nfunction cos(a){return Math.cos(degreesToRadians(a))};\nfunction sin(a){return Math.sin(degreesToRadians(a))};\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\ttry{\n\t\t\treturn recursiveRotation(layer.parent,rot+=([layer.parent.transform.xRotation, layer.parent.transform.yRotation, layer.parent.transform.zRotation]+layer.parent.transform.orientation));\n\t\t\t}\n\t\tcatch(err){\n\t\t\treturn recursiveRotation(layer.parent,rot+=([0, 0, layer.parent.transform.rotation]));\n\t\t}\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}\n\nfunction recursivePosition(layer, pos){\n\tif(layer.hasParent){\n\t\treturn recursivePosition(layer.parent, pos+=layer.parent.transform.position);\n\t}\n\telse{\n\t\treturn pos;\n\t}\n}\n",
 
     posCirc: "cntrl = thisComp.layer(" + '"' + this.texts.nullControlNameCirc+ '"' +");\nr = cntrl.effect(1)(1);\na = degreesToRadians(cntrl.effect(2)(1));\na1 = degreesToRadians(recursiveRotation(cntrl,cntrl.transform.rotation));\nspiral = cntrl.effect(3)(1);\nreverse = cntrl.effect(4)(1);\nthisIndex = index - (1+cntrl.index);\n\nif(reverse == true) a*=-1;\nr += thisIndex*spiral;\na *= thisIndex;\npos = [r*Math.cos(a), r*Math.sin(a)];\n\ncntrl.toComp(cntrl.transform.anchorPoint)+[pos[0]*Math.cos(a1)-pos[1]*Math.sin(a1), pos[0]*Math.sin(a1)+pos[1]*Math.cos(a1)];\n\nfunction recursiveRotation(layer,rot){\n//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\treturn recursiveRotation(layer.parent,rot+=layer.parent.rotation);\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}",
 
