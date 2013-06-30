@@ -1054,9 +1054,15 @@ function bakeExpressions(thisObj){
     for(var i = 1; i<=activeComp.layers.length;i++){
         var curLayer = activeComp.layers[i].transform;
         if(curLayer.position.expression == thisObj.expressions.pos2D || curLayer.position.expression == thisObj.expressions.pos3D || curLayer.position.expression == thisObj.expressions.posCirc){
-            curLayer.position.setValue(activeComp.layers[i].transform.position.value);
-            curLayer.position.expression = '';
 
+            try{
+                curLayer.position.setValue(curLayer.position.value);
+            }
+            catch(err){
+                curLayer.position.setValueAtTime(activeComp.time,curLayer.position.value);
+            }
+            curLayer.position.expression = '';
+            
             try{
                 curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
                 curLayer.rotation.expression = '';
@@ -1072,8 +1078,11 @@ function bakeExpressions(thisObj){
     if(thisObj.nullControl){
         if(thisObj.gridOverlay){
             //set the values from null back to the grid overlay
-            thisObj.gridOverlay("Effects")(1)(12).setValue(thisObj.nullControl.effect(8)(1).value);
-            thisObj.gridOverlay("Effects")(1)(6).setValue(thisObj.nullControl.effect(9)(1).value);
+            try{
+                thisObj.gridOverlay("Effects")(1)(12).setValue(thisObj.nullControl.effect(8)(1).value);
+                thisObj.gridOverlay("Effects")(1)(6).setValue(thisObj.nullControl.effect(9)(1).value);
+            }
+            catch(err){null}
         }
         activeComp.layers[thisObj.nullControl.index].remove();
     }
