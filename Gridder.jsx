@@ -3,7 +3,6 @@
 //v1.1 - Expressions, CC fix
 //v1.2 - Grid Overlay feature, more robust expressions, code cleanup
 //v1.5 - New grid modes - 3D and Circular
-//       Custom pseudo effect
 //       Duplicator mode
 //       Fixed bug with wrong icons folder     
 //by Nik Ska, 2013
@@ -86,6 +85,7 @@ function make2DGrid(thisObj){
             for(var i = 0; i<selLayers.length; i++){
 
                 selLayers[i].threeDLayer = false;
+                selLayers[i].transform.rotation.setValue(0);
 
                 if(thisObj.onlyRows == false){
                     if(thisObj.onlyCols == false){
@@ -159,6 +159,7 @@ function make3DGrid(thisObj){
             for(var i = 0; i<selLayers.length; i++){
                 if((selLayers[i] instanceof CameraLayer) == false){
                     selLayers[i].threeDLayer = true;
+                    selLayers[i].transform.zRotation.setValue(0);
 
                     trueIndex = i-isCam;
                     var thisZ = Math.floor(trueIndex/(thisObj.numRows*thisObj.numCols));
@@ -203,15 +204,6 @@ function makeCircGrid(thisObj){
 
         selLayers = thisObj.selLayers;
 
-
-        if(thisObj.duplicator == true){
-            //work in Duplicator mode
-            var sel = activeComp.selectedLayers;
-            if(sel && sel.length == 1){
-                selLayers = createDuplicates(sel[0], thisObj.numCols*thisObj.numRows);
-            }
-        } 
-
         //select more than one layer
         if(selLayers.length>1){
             
@@ -221,7 +213,7 @@ function makeCircGrid(thisObj){
                 selLayers[i].threeDLayer = false;
                 var r = thisObj.radius + i*thisObj.spiral;
                 var a = i*thisObj.angle+thisObj.rotateAll;
-                $.writeln(thisObj.spiralReverse)
+                // $.writeln(thisObj.spiralReverse)
                 if(thisObj.spiralReverse == true) a*=-1;
 
                 if(!selLayers[i].transform.position.isTimeVarying){
@@ -270,18 +262,14 @@ function buildGUI(thisObj){
     twoDmodeGroup.add("staticText", undefined, thisObj.texts.gridStepText).setFG([1,1,1]);
 
     var lineOne = twoDmodeGroup.add("group{orientation:'row'}");
-
     var colsBttn = lineOne.add("group{margins: 4, alignment: ['left', 'center']}").setIcon(thisObj.iconsFiles[0]).setTip(thisObj.texts.tips.col);
-
     var colsSlider = lineOne.add("slider", undefined, thisObj.numCols, 1, 15);
     colsSlider.size = 'width: 150, height: 10';
     var colsEdit = lineOne.add("editText{alignment: ['right', 'center'], size: [25,20], justify: 'center'}");
     colsEdit.text = colsSlider.value;
     
     var lineTwo = twoDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}");
-
     var rowsBttn = lineTwo.add("group { margins: 4, alignment: ['left', 'center']}").setIcon(thisObj.iconsFiles[1]).setTip(thisObj.texts.tips.row);
-
     var rowsSlider = lineTwo.add("slider", undefined, thisObj.numRows, 1, 15);
     rowsSlider.size = 'width: 150, height: 10';
     var rowsEdit = lineTwo.add("editText{alignment: ['right', 'center'], size: [25,20], justify: 'center'}");
@@ -290,15 +278,12 @@ function buildGUI(thisObj){
     twoDmodeGroup.add("statictext{alignment: ['left','top'], text: '"+thisObj.texts.setSp+"'}").setFG([1,1,1]);
 
     var lineFour = twoDmodeGroup.add("group{orientation:'row', alignment: ['fill','top']}").setIcon(thisObj.iconsFiles[3]).setTip(thisObj.texts.tips.xSpacing);
-
     var xSlider = lineFour.add ("slider", undefined, thisObj.xSpacing, 0, 1000);
     xSlider.size = 'width: 150, height: 10';
-
     var xEdit = lineFour.add("editText{alignment: ['right', 'center'], size: [30,20], justify: 'center'}", undefined, 50);
     xEdit.text = Math.floor(xSlider.value);
 
     var lineFive = twoDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}").setIcon(thisObj.iconsFiles[4]).setTip(thisObj.texts.tips.ySpacing);
-
     var ySlider = lineFive.add ("slider", undefined, thisObj.ySpacing, 0, 1000);
     ySlider.size = 'width: 150, height: 10';
     var yEdit = lineFive.add ("editText{alignment: ['right', 'center'], size: [30,20], justify: 'center'}");
@@ -320,9 +305,7 @@ function buildGUI(thisObj){
 
 
     var lineOne3d = threeDmodeGroup.add("group{orientation:'row',alignment:['left','top']}");
-
     var colsBttn3d = lineOne3d.add("group{margins: 4, alignment: ['left', 'center']}").setIcon(thisObj.iconsFiles[0]).setTip(thisObj.texts.tips.col);
-
     var colsSlider3d = lineOne3d.add("slider", undefined, thisObj.numCols, 1, 15);
     colsSlider3d.size = 'width: 100, height: 10';
     var colsEdit3d = lineOne3d.add("editText{alignment: ['right', 'center'], size: [25,20], justify: 'center'}");
@@ -332,9 +315,7 @@ function buildGUI(thisObj){
     planeSelect.selection = thisObj.planeSelect;
 
     var line3D = threeDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}");
-
     var rowsBttn3d = line3D.add("group { margins: 4, alignment: ['left', 'center']}").setIcon(thisObj.iconsFiles[1]).setTip(thisObj.texts.tips.row);
-
     var rowsSlider3d = line3D.add("slider", undefined, thisObj.numRows, 1, 15);
     rowsSlider3d.size = 'width: 100, height: 10';
     var rowsEdit3d = line3D.add("editText{alignment: ['left', 'center'], size: [25,20], justify: 'center'}");
@@ -343,29 +324,21 @@ function buildGUI(thisObj){
     threeDmodeGroup.add("statictext{alignment: ['left','top'], text: '"+thisObj.texts.setSp+"'}").setFG([1,1,1]);
 
     var lineFour3d = threeDmodeGroup.add("group{orientation:'row', alignment: ['fill','top']}").setTip(thisObj.texts.tips.xSpacing);
-
     lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "X")
-
     var xSlider3d = lineFour3d.add ("slider", undefined, thisObj.xSpacing, 0, 1000);
     xSlider3d.size = 'width: 40, height: 10';
-
     var xEdit3d = lineFour3d.add("editText{alignment: ['left', 'center'], size: [30,20], justify: 'center'}", undefined, 50);
     xEdit3d.text = Math.floor(xSlider3d.value);
-
     lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "Y")
-
     var ySlider3d = lineFour3d.add ("slider", undefined, thisObj.ySpacing, 0, 1000);
     ySlider3d.size = 'width: 40, height: 10';
     var yEdit3d = lineFour3d.add ("editText{alignment: ['left', 'center'], size: [30,20], justify: 'center'}");
     yEdit3d.text = Math.floor(ySlider3d.value);
 
     var lineFive3d = threeDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}")
-
     lineFive3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "Z").setTip(thisObj.texts.tips.zSpacing);
-
     var zSlider = lineFive3d.add ("slider", undefined, thisObj.ySpacing, 0, 1000);
     zSlider.size = 'width: 40, height: 10';
-
     var zEdit = lineFive3d.add ("editText{alignment: ['left', 'center'], size: [30,20], justify: 'center'}");
     zEdit.text = Math.floor(zSlider.value);
 
@@ -378,11 +351,9 @@ function buildGUI(thisObj){
     //Circular mode
     //==================================
 
-
     var circModeGroup = mainGroup.add("group{orientation:'column',alignment:['left','top'],alignChildren:['left','top']}").setFG([1,1,1]);
     circModeGroup.visible = false;
     circModeGroup.add("staticText", undefined, thisObj.texts.circModeHeader).setFG([1,1,1]);
-
 
     var lineOneCirc = circModeGroup.add("group{orientation:'row'}");
     var radiusBttn = lineOneCirc.add("group{margins: 4, alignment: ['left', 'center'], alignChildren:['left', 'top']}").setIcon(thisObj.iconsFiles[13]).setTip(thisObj.texts.tips.radius);
@@ -390,7 +361,6 @@ function buildGUI(thisObj){
     radiusSlider.size = 'width: 150, height: 10';
     var radiusEdit = lineOneCirc.add("editText{size: [25,20], justify: 'center'}");
     radiusEdit.text = radiusSlider.value;
-
 
     var lineTwoCirc = circModeGroup.add("group{orientation:'row',alignment:['fill','top'], alignChildren:['left', 'top']}");
     var angleButton = lineTwoCirc.add("group { margins: 4}").setIcon(thisObj.iconsFiles[10]).setTip(thisObj.texts.tips.angle);
@@ -415,7 +385,7 @@ function buildGUI(thisObj){
     var spiralBttn = lineFourCirc.add("group{margins: 4, alignment: ['left', 'center'], alignChildren:['left', 'top']}").setIcon(thisObj.iconsFiles[11]).setTip(thisObj.texts.tips.spiral);
     spiralBttn.setState(false);
 
-    var spiralSlider = lineFourCirc.add("slider", undefined, thisObj.spiral, 0, 200);
+    var spiralSlider = lineFourCirc.add("slider", undefined, thisObj.spiral, 0, 50);
     spiralSlider.size = 'width: 127, height: 10';
     var spiralEdit = lineFourCirc.add("editText{size: [25,20], justify: 'center'}");
     spiralEdit.text = spiralSlider.value;
@@ -423,12 +393,9 @@ function buildGUI(thisObj){
     spiralReverse.value = false;
     thisObj.spiralReverse = false;
 
-
-
     //==================================
     //Expression panel
     //==================================
-
 
     var exprPanel = thisObj.w.add("panel{text: 'Expressions', justify: 'center', alignment:['fill','top'], properties:{borderStyle: 'black'}}").setFG([1,1,1]);
     exprPanel.margins = [10,20,10,10];
@@ -580,6 +547,7 @@ function buildGUI(thisObj){
             twoDmodeGroup.visible = true;
             threeDmodeGroup.visible = false;
             circModeGroup.visible = false;
+            optionPanel.enabled = true;
 
             duplicatorBttn.enabled = true;
             gridOverlayBttn.enabled = true;
@@ -593,8 +561,9 @@ function buildGUI(thisObj){
             rectModeBttn.setState(false);
             threeDModeBttn.setState(true);
             circModeBttn.setState(false);
+            optionPanel.enabled = false;
 
-            duplicatorBttn.enabled = true;
+            duplicatorBttn.enabled = false;
             gridOverlayBttn.enabled = false;
 
         }
@@ -606,6 +575,7 @@ function buildGUI(thisObj){
             rectModeBttn.setState(false);
             threeDModeBttn.setState(false);
             circModeBttn.setState(true);
+            optionPanel.enabled = false;
 
             duplicatorBttn.enabled = false;
             gridOverlayBttn.enabled = false;
@@ -1062,14 +1032,14 @@ function bakeExpressions(thisObj){
                 curLayer.position.setValueAtTime(activeComp.time,curLayer.position.value);
             }
             curLayer.position.expression = '';
-            
+
             try{
-                curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
-                curLayer.rotation.expression = '';
-            }
-            catch(err){
                 curLayer.orientation.setValue(activeComp.layers[i].orientation.value);
                 curLayer.orientation.expression = '';
+            }
+            catch(err){
+                curLayer.rotation.setValue(activeComp.layers[i].transform.rotation.value%360);
+                curLayer.rotation.expression = '';
             }
             
         }
