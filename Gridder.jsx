@@ -61,7 +61,7 @@ gridder.make2DGrid = function(){
     //main function to arrage elements into 2D grid
     var activeComp = app.project.activeItem;
 
-    if(activeComp != null && activeComp instanceof CompItem){
+    if(activeComp !== null && activeComp instanceof CompItem){
         var selLayers;
 
         // if(activeComp.selectedLayers.length!=gridder.selLength){
@@ -76,9 +76,9 @@ gridder.make2DGrid = function(){
 
         app.beginUndoGroup("Make 2D Grid");
 
-        var selLayers = activeComp.selectedLayers;
+        selLayers = activeComp.selectedLayers;
 
-        if(this.duplicator == true){
+        if(this.duplicator === true){
             //work in Duplicator mode
             var sel = activeComp.selectedLayers;
             if(sel && sel.length == 1){
@@ -92,12 +92,13 @@ gridder.make2DGrid = function(){
             var firstPos = selLayers[0].transform.position.value;
 
             for(var i = 0; i<selLayers.length; i++){
-
+              var thisCol;
+              var thisRow;
                 selLayers[i].threeDLayer = false;
                 selLayers[i].transform.rotation.setValue(0);
 
-                if(this.onlyRows == false){
-                    if(this.onlyCols == false){
+                if(this.onlyRows === false){
+                    if(this.onlyCols === false){
                         //rectangular grid
                         trueIndex = i%(this.numRows*this.numCols);
                     }
@@ -105,8 +106,8 @@ gridder.make2DGrid = function(){
                         //only columns
                         trueIndex = i;
                     }
-                    var thisCol = trueIndex % this.numCols;
-                    var thisRow = Math.floor(trueIndex/this.numCols);
+                    thisCol = trueIndex % this.numCols;
+                    thisRow = Math.floor(trueIndex/this.numCols);
 
                     if(!selLayers[i].transform.position.isTimeVarying){
                         selLayers[i].transform.position.setValue(firstPos+[thisCol*dist[0], thisRow*dist[1]]);
@@ -118,8 +119,8 @@ gridder.make2DGrid = function(){
                 else{
                     //only rows
                     trueIndex = i;
-                    var thisCol = trueIndex % this.numRows;
-                    var thisRow = Math.floor(trueIndex/this.numRows);
+                    thisCol = trueIndex % this.numRows;
+                    thisRow = Math.floor(trueIndex/this.numRows);
                     if(!selLayers[i].transform.position.isTimeVarying){
                         selLayers[i].transform.position.setValue(firstPos+[thisRow*dist[0], thisCol*dist[1]]);
                     }
@@ -134,19 +135,19 @@ gridder.make2DGrid = function(){
         }
         app.endUndoGroup();
     }
-}
+};
 
 gridder.make3DGrid = function(){
     var activeComp = app.project.activeItem;
 
-    if(activeComp != null && activeComp instanceof CompItem){
+    if(activeComp !== null && activeComp instanceof CompItem){
         app.beginUndoGroup("Make 3D Grid");
         var selLayers;
 
         if(activeComp.selectedLayers.length!=this.selLength){
             //upon new selection
             this.selLayers = activeComp.selectedLayers.sort(function(a,b){
-                return (a.index - b.index)
+                return (a.index - b.index);
             });
             this.selLength = this.selLayers.length;
         }
@@ -154,7 +155,7 @@ gridder.make3DGrid = function(){
         selLayers = this.selLayers;
 
 
-        if(this.duplicator == true){
+        if(this.duplicator === true){
             //work in Duplicator mode
             var sel = activeComp.selectedLayers;
             if(sel && sel.length == 1){
@@ -168,7 +169,7 @@ gridder.make3DGrid = function(){
             var firstPos = selLayers[0].transform.position.value;
             var isCam = 0;
             for(var i = 0; i<selLayers.length; i++){
-                if((selLayers[i] instanceof CameraLayer) == false){
+                if((selLayers[i] instanceof CameraLayer) === false){
                     selLayers[i].threeDLayer = true;
                     selLayers[i].transform.zRotation.setValue(0);
 
@@ -179,10 +180,10 @@ gridder.make3DGrid = function(){
 
                     var thisX = trueIndex % this.numCols;
                     var thisY = Math.floor(trueIndex/this.numCols);
-
-                    if(this.planeSelect == 0) var pV = [thisX*dist3d[0], thisY*dist3d[1], thisZ*dist3d[2]]; //XY
-                    else if(this.planeSelect == 1) var pV = [thisZ*dist3d[0], thisY*dist3d[1], thisX*dist3d[2]]; //XZ
-                    else if(this.planeSelect == 2) var pV = [thisX*dist3d[0], thisZ*dist3d[1], thisY*dist3d[2]];//YZ
+                    var pV;
+                    if(this.planeSelect === 0) pV = [thisX*dist3d[0], thisY*dist3d[1], thisZ*dist3d[2]]; //XY
+                    else if(this.planeSelect == 1) pV = [thisZ*dist3d[0], thisY*dist3d[1], thisX*dist3d[2]]; //XZ
+                    else if(this.planeSelect == 2) pV = [thisX*dist3d[0], thisZ*dist3d[1], thisY*dist3d[2]];//YZ
 
 
                     if(!selLayers[i].transform.position.isTimeVarying){
@@ -196,20 +197,20 @@ gridder.make3DGrid = function(){
             }
         }
     }
-}
+};
 
 
 gridder.makeCircGrid = function(){
     var activeComp = app.project.activeItem;
 
-    if(activeComp != null && activeComp instanceof CompItem){
+    if(activeComp !== null && activeComp instanceof CompItem){
         app.beginUndoGroup("Make Circular Grid");
         var selLayers;
 
         if(activeComp.selectedLayers.length!=this.selLength){
             //upon new selection
             this.selLayers = activeComp.selectedLayers.sort(function(a,b){
-                return (a.index - b.index)
+                return (a.index - b.index);
             });
             this.selLength = this.selLayers.length;
         }
@@ -226,7 +227,7 @@ gridder.makeCircGrid = function(){
                 var r = this.radius + i*this.spiral;
                 var a = i*this.angle+this.rotateAll;
                 // $.writeln(this.spiralReverse)
-                if(this.spiralReverse == true) a*=-1;
+                if(this.spiralReverse === true) a*=-1;
 
                 if(!selLayers[i].transform.position.isTimeVarying){
                     selLayers[i].transform.position.setValue(firstPos+[r*Math.cos(a), r*Math.sin(a)]);
@@ -237,15 +238,15 @@ gridder.makeCircGrid = function(){
             }
         }
     }
-}
+};
 
 gridder.buildGUI =function(thisObj){
     thisObj.getPrefs();
     // thisObj.gridMode = "RECT";
 
     //creating icons in appdata folder
-    thisObj.iconsFiles = new Array();
-    var fldr = new Folder(Folder.userData.fullName + '/gridder/')
+    thisObj.iconsFiles = [];
+    var fldr = new Folder(Folder.userData.fullName + '/gridder/');
     fldr.create();
     for(i = 0; i <= 13; i++) {
         thisObj.iconsFiles[i] = new File(fldr.fullName+'/gridderIconFile_'+ i + ".png");
@@ -259,9 +260,9 @@ gridder.buildGUI =function(thisObj){
     var w = thisObj.w;
     thisObj.w.preferredSize = "width: 250, height: 450";
     thisObj.w.maximumSize = "width:250, height: 450";
-    thisObj.w.alignChildren = ["left", "top"]
+    thisObj.w.alignChildren = ["left", "top"];
     thisObj.w.margins = [10,10,10,0];
-    thisObj.w.setBG([.25,.25,.25])
+    thisObj.w.setBG([0.25,0.25,0.25]);
 
 
     var mainGroup = thisObj.w.add("group{orientation:'stack',alignment:['left','top']}");
@@ -303,8 +304,8 @@ gridder.buildGUI =function(thisObj){
 
     var lineThree = twoDmodeGroup.add("group{orientation:'row'}");
     var sqGridChckbx = lineThree.add("checkbox", undefined, thisObj.texts.square).setTip(thisObj.texts.tips.sqGrid).setFG([1,1,1]);
-    sqGridChckbx.preferredSize = [85,20]
-    sqGridChckbx.value = parseInt(thisObj.sqGrid);
+    sqGridChckbx.preferredSize = [85,20];
+    sqGridChckbx.value = parseInt(thisObj.sqGrid,10);
 
     //==================================
     //3D Mode
@@ -336,18 +337,18 @@ gridder.buildGUI =function(thisObj){
     threeDmodeGroup.add("statictext{alignment: ['left','top'], text: '"+thisObj.texts.setSp+"'}").setFG([1,1,1]);
 
     var lineFour3d = threeDmodeGroup.add("group{orientation:'row', alignment: ['fill','top']}").setTip(thisObj.texts.tips.xSpacing);
-    lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "X")
+    lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "X");
     var xSlider3d = lineFour3d.add ("slider", undefined, thisObj.xSpacing, 0, 1000);
     xSlider3d.size = 'width: 40, height: 10';
     var xEdit3d = lineFour3d.add("editText{alignment: ['left', 'center'], size: [30,20], justify: 'center'}", undefined, 50);
     xEdit3d.text = Math.floor(xSlider3d.value);
-    lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "Y")
+    lineFour3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "Y");
     var ySlider3d = lineFour3d.add ("slider", undefined, thisObj.ySpacing, 0, 1000);
     ySlider3d.size = 'width: 40, height: 10';
     var yEdit3d = lineFour3d.add ("editText{alignment: ['left', 'center'], size: [30,20], justify: 'center'}");
     yEdit3d.text = Math.floor(ySlider3d.value);
 
-    var lineFive3d = threeDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}")
+    var lineFive3d = threeDmodeGroup.add("group{orientation:'row',alignment:['fill','top']}");
     lineFive3d.add("group{margins: 4, alignment: ['left', 'center']}").add("statictext", undefined, "Z").setTip(thisObj.texts.tips.zSpacing);
     var zSlider = lineFive3d.add ("slider", undefined, thisObj.ySpacing, 0, 1000);
     zSlider.size = 'width: 40, height: 10';
@@ -356,8 +357,8 @@ gridder.buildGUI =function(thisObj){
 
     var lineThree3d = threeDmodeGroup.add("group{orientation:'row',alignment:['left','top']}");
     var sqGridChckbx3d = lineThree3d.add("checkbox", undefined, thisObj.texts.square).setTip(thisObj.texts.tips.sqGrid).setFG([1,1,1]);
-    sqGridChckbx3d.preferredSize = [85,20]
-    sqGridChckbx3d.value = parseInt(thisObj.sqGrid);
+    sqGridChckbx3d.preferredSize = [85,20];
+    sqGridChckbx3d.value = parseInt(thisObj.sqGrid,10);
 
     //==================================
     //Circular mode
@@ -453,13 +454,13 @@ gridder.buildGUI =function(thisObj){
     //==================================
 
     gridOverlayBttn.addEventListener("mousedown", function(k){
-        if(k.button == 0){
+        if(k.button === 0){
             gridOverlayBttn.setState(true);
         }
     });
 
     gridOverlayBttn.addEventListener("mouseup", function(k){
-        if(k.button == 0){
+        if(k.button === 0){
             gridOverlayBttn.setState(false);
             thisObj.createGridOverlay();
             thisObj.updateGridOverlay();
@@ -469,7 +470,7 @@ gridder.buildGUI =function(thisObj){
 
     duplicatorBttn.addEventListener("click", function(k){
         //clicking images
-        if(k.button == 0){
+        if(k.button === 0){
             thisObj.duplicator =! thisObj.duplicator;
             duplicatorBttn.setState(thisObj.duplicator);
         }
@@ -478,34 +479,34 @@ gridder.buildGUI =function(thisObj){
     spiralReverse.onClick = function (){
         thisObj.spiralReverse =! thisObj.spiralReverse;
         doGrid();
-    }
+    };
 
     createExpr.onClick = function(){
         updateSliders();
         updateSpacingStates();
         thisObj.createExpressions();
-    }
+    };
 
     bakeExpr.onClick = function(){
         thisObj.bakeExpressions();
-    }
+    };
 
     sqGridChckbx.onClick = function(){
         yEdit.text = xEdit.text;
         updateSliders();
         doGrid();
-    }
+    };
 
     sqGridChckbx3d.onClick = function(){
         yEdit3d.text = xEdit3d.text;
         zEdit.text = xEdit3d.text;
         updateSliders();
         doGrid();
-    }
+    };
 
     colsBttn.addEventListener("click", function(k){
         //clicking images
-        if(k.button == 0){
+        if(k.button === 0){
             thisObj.onlyCols =!thisObj.onlyCols; //change clicked state
             setRowCol(colsBttn); //update radiobutton states
             doGrid();
@@ -514,7 +515,7 @@ gridder.buildGUI =function(thisObj){
 
     rowsBttn.addEventListener("click", function(k){
         //clicking images
-        if(k.button == 0){
+        if(k.button === 0){
             thisObj.onlyRows =!thisObj.onlyRows; //change clicked state
             setRowCol(rowsBttn); //update radiobutton states
             doGrid();
@@ -523,8 +524,8 @@ gridder.buildGUI =function(thisObj){
 
     rectModeBttn.addEventListener("click", function(k){
         //setting 2D grid mode
-        if(k.button == 0){
-            thisObj.gridMode = "RECT"
+        if(k.button === 0){
+            thisObj.gridMode = "RECT";
             updateModes();
             doGrid();
         }
@@ -532,8 +533,8 @@ gridder.buildGUI =function(thisObj){
 
     threeDModeBttn.addEventListener("click", function(k){
         //setting 3D grid mode
-        if(k.button == 0){
-            thisObj.gridMode = "3D"
+        if(k.button === 0){
+            thisObj.gridMode = "3D";
             updateModes();
             doGrid();
         }
@@ -541,8 +542,8 @@ gridder.buildGUI =function(thisObj){
 
     circModeBttn.addEventListener("click", function(k){
         //setting circular grid mode
-        if(k.button == 0){
-            thisObj.gridMode = "CIRC"
+        if(k.button === 0){
+            thisObj.gridMode = "CIRC";
             updateModes();
             doGrid();
         }
@@ -598,12 +599,12 @@ gridder.buildGUI =function(thisObj){
     planeSelect.onChange = function(){
         thisObj.planeSelect = planeSelect.selection.index;
         doGrid();
-    }
+    };
 
     function setRowCol(caller){
         //Main function for custom radiobuttons work.
 
-        if(thisObj.onlyCols == true && thisObj.onlyRows == true){
+        if(thisObj.onlyCols === true && thisObj.onlyRows === true){
             if(caller == rowsBttn){
                 thisObj.onlyCols = false;
                 thisObj.onlyRows = true;
@@ -640,78 +641,84 @@ gridder.buildGUI =function(thisObj){
 
 
     for(var i = 0; i < editFields.length; i++){
-        editFields[i].onChanging = function(){
+      // linter says "DONT MAKE FUNCTIONS IN THE LOOP!" fabiantheblind
+        editFields[i].onChanging = updateFields();
            //if(isNan(Number(this.text))) this.text = this.text.match(/(\d*)/)[1]
-            updateFields()};
+            // updateFields();
 
-        editFields[i].onEnterKey = function(){updateFields()};
+      // linter says "DONT MAKE FUNCTIONS IN THE LOOP!" fabiantheblind
+
+        editFields[i].onEnterKey = updateFields();
+
+      // linter says "DONT MAKE FUNCTIONS IN THE LOOP!" fabiantheblind
 
         sliders[i].boundField = editFields[i];
 
         if(i<8){
         //set first 8 sliders
+      // linter says "DONT MAKE FUNCTIONS IN THE LOOP!" fabiantheblind
             sliders[i].onChange = function(){
                 // $.writeln(isNaN(Number(sliders[i].value)))
-                this.boundField.text = parseInt(this.value);
+                this.boundField.text = parseInt(this.value,10);
                 doGrid();
-            }
+            };
         }
     }
 
     xSlider.onChange = function () {
-        this.boundField.text = parseInt(this.value);
+        this.boundField.text = parseInt(this.value,10);
         if(sqGridChckbx.value == 1){
             ySlider.value = xSlider.value;
-            yEdit.text = parseInt(ySlider.value);
+            yEdit.text = parseInt(ySlider.value,10);
         }
 
         doGrid();
-    }
+    };
 
     ySlider.onChange = function () {
-        this.boundField.text = parseInt(this.value);
+        this.boundField.text = parseInt(this.value,10);
         if(sqGridChckbx.value == 1){
             xSlider.value = ySlider.value;
-            xEdit.text = parseInt(ySlider.value);
+            xEdit.text = parseInt(ySlider.value,10);
         }
         doGrid();
-    }
+    };
 
     xSlider3d.onChange = function () {
-        this.boundField.text = parseInt(this.value);
+        this.boundField.text = parseInt(this.value,10);
         if(sqGridChckbx3d.value == 1){
             ySlider3d.value = this.value;
-            ySlider3d.boundField.text = parseInt(ySlider3d.value);
+            ySlider3d.boundField.text = parseInt(ySlider3d.value,10);
 
             zSlider.value = this.value;
-            zSlider.boundField.text = parseInt(zSlider.value);
+            zSlider.boundField.text = parseInt(zSlider.value,10);
         }
         doGrid();
-    }
+    };
 
     ySlider3d.onChange = function () {
-        thisObj.boundField.text = parseInt(this.value);
+        thisObj.boundField.text = parseInt(this.value,10);
         if(sqGridChckbx3d.value == 1){
             xSlider3d.value = this.value;
-            xSlider3d.boundField.text = parseInt(this.value);
+            xSlider3d.boundField.text = parseInt(this.value,10);
 
             zSlider.value = this.value;
-            zSlider.boundField.text = parseInt(zSlider.value);
+            zSlider.boundField.text = parseInt(zSlider.value,10);
         }
         doGrid();
-    }
+    };
 
     zSlider.onChange = function () {
-        this.boundField.text = parseInt(this.value);
+        this.boundField.text = parseInt(this.value,10);
         if(sqGridChckbx3d.value == 1){
             xSlider3d.value = this.value;
-            xSlider3d.boundField.text = parseInt(this.value);
+            xSlider3d.boundField.text = parseInt(this.value,10);
 
             ySlider3d.value = this.value;
-            ySlider3d.boundField.text = parseInt(ySlider3d.value);
+            ySlider3d.boundField.text = parseInt(ySlider3d.value,10);
         }
         doGrid();
-    }
+    };
 
 
     //==================================
@@ -727,8 +734,8 @@ gridder.buildGUI =function(thisObj){
     function updateSliders(){
         for (var i = 0; i < editFields.length; i++) {
             if(isNaN(Number(editFields[i].text))) sliders[i].value = 1;
-            else sliders[i].value = parseInt(editFields[i].text);
-        };
+            else sliders[i].value = parseInt(editFields[i].text,10);
+        }
     }
 
     function updateSpacingStates(){
@@ -743,7 +750,7 @@ gridder.buildGUI =function(thisObj){
             else{
                 thisObj.xSpacing = xSlider.value;
                 thisObj.ySpacing = ySlider.value;
-                dist = [xSlider.value, ySlider.value]
+                dist = [xSlider.value, ySlider.value];
             }
             thisObj.sqGrid = sqGridChckbx.value;
 
@@ -800,7 +807,7 @@ gridder.buildGUI =function(thisObj){
     }
 
     else thisObj.w.layout.layout(true);
-}
+};
 
 //==================================
 //Create expressions
@@ -808,7 +815,7 @@ gridder.buildGUI =function(thisObj){
 gridder.createExpressions = function(){
     var activeComp = app.project.activeItem;
 
-    if(activeComp != null && activeComp instanceof CompItem){
+    if(activeComp !== null && activeComp instanceof CompItem){
         app.beginUndoGroup("Creating expressions");
 
         var selLayers = activeComp.selectedLayers;
@@ -822,47 +829,56 @@ gridder.createExpressions = function(){
             //======================
             //Rectangle mode
             //======================
-
+            var nullExists;
+            var nullControl;
+            var stepXControl;
+            var stepYControl;
+            var onlyColsControl;
+            var onlyRowsControl;
+            var spacingXControl;
+            var spacingYControl;
+            var sqGridControl;
+            var colorControl;
             if(this.gridMode == "RECT"){
 
-                var nullExists = false
+                nullExists = false;
                 for(var i = 1; i<=activeComp.layers.length;i++){
                     if(activeComp.layers[i].name == this.texts.nullControlName){
-                        var nullControl = activeComp.layers[i];
+                        nullControl = activeComp.layers[i];
                         nullExists = true;
                     }
                 }
 
-                if(nullExists == false){
-                    this.nullControl = activeComp.layers.addNull(activeComp.duration)
+                if(nullExists === false){
+                    this.nullControl = activeComp.layers.addNull(activeComp.duration);
                     this.nullControl.label = 11;
 
                     this.nullControl.moveBefore(selLayers[0]);
 
                     this.nullControl.name = this.texts.nullControlName;
 
-                    var stepXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    stepXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     stepXControl.name = "Colums";
 
-                    var stepYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    stepYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     stepYControl.name = "Rows";
 
-                    var onlyColsControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    onlyColsControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     onlyColsControl.name = "Only Columns";
 
-                    var onlyRowsControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    onlyRowsControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     onlyRowsControl.name = "Only Rows";
 
-                    var spacingXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    spacingXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     spacingXControl.name = "Spacing X";
 
-                    var spacingYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    spacingYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     spacingYControl.name = "Spacing Y";
 
-                    var sqGridControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    sqGridControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     sqGridControl.name = "Square Grid";
 
-                    var colorControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Color Control");
+                    colorControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Color Control");
                     colorControl.name = this.texts.colorControlName;
                     colorControl(1).setValue([0,1,1]);
 
@@ -872,27 +888,27 @@ gridder.createExpressions = function(){
 
 
                     //set expresions
-                    this.nullControl.effect(1).slider.expression = "if(value==0) value = 1 else value"
-                    this.nullControl.effect(2).slider.expression = "if(value==0) value = 1 else value"
-                    this.nullControl.effect(3).checkbox.expression = "if(effect(4)(1) == true) false else value"
-                    this.nullControl.effect(4).checkbox.expression = "if(effect(3)(1) == true) false else value"
-                    this.nullControl.effect(6).slider.expression = "if(effect(7)(1) == true) effect(5)(1) else value";
+                    this.nullControl.effect(1)("ADBE Slider Control-0001").expression = "if(value==0) value = 1 else value";
+                    this.nullControl.effect(2)("ADBE Slider Control-0001").expression = "if(value==0) value = 1 else value";
+                    this.nullControl.effect(3)("ADBE Checkbox Control-0001").expression = "if(effect(4)(1) == true) false else value";
+                    this.nullControl.effect(4)("ADBE Checkbox Control-0001").expression = "if(effect(3)(1) == true) false else value";
+                    this.nullControl.effect(6)("ADBE Slider Control-0001").expression = "if(effect(7)(1) == true) effect(5)(1) else value";
                 }
 
                 //set slider values
-                this.nullControl.effect(1).slider.setValue(this.numCols);
-                this.nullControl.effect(2).slider.setValue(this.numRows);
-                this.nullControl.effect(3).checkbox.setValue(this.onlyCols)
-                this.nullControl.effect(4).checkbox.setValue(this.onlyRows)
-                this.nullControl.effect(5).slider.setValue(this.xSpacing);
-                this.nullControl.effect(6).slider.setValue(this.ySpacing);
-                this.nullControl.effect(7).checkbox.setValue(this.sqGrid);
+                this.nullControl.effect(1)("ADBE Slider Control-0001").setValue(this.numCols);
+                this.nullControl.effect(2)("ADBE Slider Control-0001").setValue(this.numRows);
+                this.nullControl.effect(3)("ADBE Checkbox Control-0001").setValue(this.onlyCols);
+                this.nullControl.effect(4)("ADBE Checkbox Control-0001").setValue(this.onlyRows);
+                this.nullControl.effect(5)("ADBE Slider Control-0001").setValue(this.xSpacing);
+                this.nullControl.effect(6)("ADBE Slider Control-0001").setValue(this.ySpacing);
+                this.nullControl.effect(7)("ADBE Checkbox Control-0001").setValue(this.sqGrid);
 
                 this.nullControl.transform.position.setValue([selLayers[0].transform.position.value[0],selLayers[0].transform.position.value[1]]);
-                for(var i = 0; i<selLayers.length; i++){
+                for(var j = 0; j<selLayers.length; j++){
                     //set expressions for selected layers
-                    selLayers[i].transform.position.expression = this.expressions.pos2D;
-                    selLayers[i].transform.rotation.expression = this.expressions.rot2D;
+                    selLayers[j].transform.position.expression = this.expressions.pos2D;
+                    selLayers[j].transform.rotation.expression = this.expressions.rot2D;
                 }
             }
 
@@ -901,16 +917,16 @@ gridder.createExpressions = function(){
             //======================
 
             else if(this.gridMode == "3D"){
-                var nullExists = false
-                for(var i = 1; i<=activeComp.layers.length;i++){
-                    if(activeComp.layers[i].name == this.texts.nullControlName3D){
-                        var nullControl = activeComp.layers[i];
+                nullExists = false;
+                for(var k = 1; k<=activeComp.layers.length;k++){
+                    if(activeComp.layers[k].name == this.texts.nullControlName3D){
+                        nullControl = activeComp.layers[k];
                         nullExists = true;
                     }
                 }
 
-                if(nullExists == false){
-                    this.nullControl = activeComp.layers.addNull(activeComp.duration)
+                if(nullExists === false){
+                    this.nullControl = activeComp.layers.addNull(activeComp.duration);
                     this.nullControl.label = 13;
 
                     this.nullControl.threeDLayer = true;
@@ -918,31 +934,31 @@ gridder.createExpressions = function(){
                     this.nullControl.moveBefore(selLayers[0]);
 
                     this.nullControl.name = this.texts.nullControlName3D;
-                    var stepXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    stepXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     stepXControl.name = "Colums";
 
-                    var stepYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    stepYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     stepYControl.name = "Rows";
 
-                    var XYChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    XYChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     XYChckbx.name = "XY";
 
-                    var XZChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    XZChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     XZChckbx.name = "XZ";
 
-                    var YZChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    YZChckbx = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     YZChckbx.name = "YZ";
 
-                    var spacingXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    spacingXControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     spacingXControl.name = "Spacing X";
 
-                    var spacingYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    spacingYControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     spacingYControl.name = "Spacing Y";
 
-                    var spacingZControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
+                    spacingZControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Slider Control");
                     spacingZControl.name = "Spacing Z";
 
-                    var sqGridControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
+                    sqGridControl = this.nullControl.property("ADBE Effect Parade").addProperty("ADBE Checkbox Control");
                     sqGridControl.name = "Square Grid";
 
                     //set expresions
@@ -961,11 +977,11 @@ gridder.createExpressions = function(){
                 this.nullControl.effect(1).slider.setValue(this.numCols);
                 this.nullControl.effect(2).slider.setValue(this.numRows);
 
-                for(var i = 0; i <= 2; i++){
-                    if(this.planeSelect == i){
-                        this.nullControl.effect(3+i).checkbox.setValue(true);
+                for(var l = 0; l <= 2; l++){
+                    if(this.planeSelect == l){
+                        this.nullControl.effect(3+l).checkbox.setValue(true);
                     }
-                    else this.nullControl.effect(3+i).checkbox.setValue(false);
+                    else this.nullControl.effect(3+l).checkbox.setValue(false);
                 }
 
                 this.nullControl.effect(6).slider.setValue(this.xSpacing);
@@ -975,10 +991,10 @@ gridder.createExpressions = function(){
                 this.nullControl.effect(9).checkbox.setValue(this.sqGrid);
 
                 this.nullControl.transform.position.setValue([selLayers[0].transform.position.value[0],selLayers[0].transform.position.value[1]]);
-                for(var i = 0; i<selLayers.length; i++){
+                for(var m = 0; m<selLayers.length; m++){
                     //set expressions for selected layers
-                    selLayers[i].position.expression = this.expressions.pos3D;
-                    selLayers[i].orientation.expression = this.expressions.rot3D;
+                    selLayers[m].position.expression = this.expressions.pos3D;
+                    selLayers[m].orientation.expression = this.expressions.rot3D;
                 }
             }
 
@@ -987,16 +1003,16 @@ gridder.createExpressions = function(){
             //======================
 
             else if(this.gridMode == "CIRC"){
-                var nullExists = false
-                for(var i = 1; i<=activeComp.layers.length;i++){
-                    if(activeComp.layers[i].name == this.texts.nullControlNameCirc){
-                        var nullControl = activeComp.layers[i];
+                nullExists = false;
+                for(var n = 1; n<=activeComp.layers.length;n++){
+                    if(activeComp.layers[n].name == this.texts.nullControlNameCirc){
+                        nullControl = activeComp.layers[n];
                         nullExists = true;
                     }
                 }
 
-                if(nullExists == false){
-                    this.nullControl = activeComp.layers.addNull(activeComp.duration)
+                if(nullExists === false){
+                    this.nullControl = activeComp.layers.addNull(activeComp.duration);
                     this.nullControl.label = 12;
 
                     this.nullControl.moveBefore(selLayers[0]);
@@ -1019,27 +1035,27 @@ gridder.createExpressions = function(){
                 //set slider values
                 this.nullControl.effect(1).slider.setValue(this.radius);
                 this.nullControl.effect(2).slider.setValue(this.angle*180/Math.PI);
-                this.nullControl.effect(3).slider.setValue(this.spiral)
+                this.nullControl.effect(3).slider.setValue(this.spiral);
                 // this.nullControl.effect(4).checkbox.setValue(this.onlyCols)
 
                 this.nullControl.transform.position.setValue([activeComp.width/2, activeComp.height/2]);
-                for(var i = 0; i<selLayers.length; i++){
+                for(var o = 0; o<selLayers.length; o++){
                     //set expressions for selected layers
-                    selLayers[i].transform.position.expression = this.expressions.posCirc;
-                    selLayers[i].transform.rotation.expression = this.expressions.rotCirc;
+                    selLayers[o].transform.position.expression = this.expressions.posCirc;
+                    selLayers[o].transform.rotation.expression = this.expressions.rotCirc;
                 }
             }
         }
     }
     app.endUndoGroup();
-}
+};
 
 //==================================
 //Baking expressions
 //==================================
 
 gridder.bakeExpressions = function(){
-    app.beginUndoGroup("Baking expressions")
+    app.beginUndoGroup("Baking expressions");
     var activeComp = app.project.activeItem;
     for(var i = 1; i<=activeComp.layers.length;i++){
         var curLayer = activeComp.layers[i].transform;
@@ -1053,7 +1069,7 @@ gridder.bakeExpressions = function(){
             }
             curLayer.position.expression = '';
 
-            if(activeComp.layers[i].threeDLayer == true){
+            if(activeComp.layers[i].threeDLayer === true){
                 curLayer.orientation.setValue(activeComp.layers[i].orientation.value);
                 curLayer.orientation.expression = '';
             }
@@ -1072,12 +1088,14 @@ gridder.bakeExpressions = function(){
                 this.gridOverlay.property("ADBE Effect Parade")(1)(12).setValue(this.nullControl.effect(8)(1).value);
                 this.gridOverlay.property("ADBE Effect Parade")(1)(6).setValue(this.nullControl.effect(9)(1).value);
             }
-            catch(err){null}
+            catch(err){
+              // null
+            }
         }
         activeComp.layers[this.nullControl.index].remove();
     }
     app.endUndoGroup();
-}
+};
 
 //==================================
 //Create and update grid overlay
@@ -1119,7 +1137,7 @@ gridder.createGridOverlay = function(){
 
         app.endUndoGroup();
     }
-}
+};
 
 gridder.updateGridOverlay = function(){
     //Function that is used for controlling grid overlay
@@ -1127,9 +1145,11 @@ gridder.updateGridOverlay = function(){
     this.gridOverlay.property("ADBE Effect Parade")(1)(4).setValue(this.xSpacing);
     this.gridOverlay.property("ADBE Effect Parade")(1)(5).setValue(this.ySpacing);
     }
-    catch(err){null }
+    catch(err){
+      // null
+       }
 
-}
+};
 
 //==================================
 //Creating duplicates function
@@ -1166,8 +1186,8 @@ gridder.createDuplicates = function(targetLayer, number){
 
         else{
             //если есть больше чем надо
-            for(var i = targetLayer.index; i<=activeLayers.length; i++){
-                if(activeLayers[i].name == targetLayer.name){
+            for(var p = targetLayer.index; p<=activeLayers.length; p++){
+                if(activeLayers[p].name == targetLayer.name){
                     //если следующий слой - копия
                     if(number>0){
                         //если не все еще нашли например
@@ -1175,8 +1195,8 @@ gridder.createDuplicates = function(targetLayer, number){
                     }
                     else{
                         //если все найдены то удаляем копию
-                        activeLayers[i].remove();
-                        i--;
+                        activeLayers[p].remove();
+                        p--;
                     }
                 }
                 else{
@@ -1186,14 +1206,14 @@ gridder.createDuplicates = function(targetLayer, number){
                         number--;
                         targetLayer.duplicate().moveAfter(targetLayer);
                         // dupLayers = dupLayers.concat(activeLayers[2]);
-                        i++;
+                        p++;
                     }
                 }
             }
         }
     }
     return(dupLayers);
-}
+};
 
 
 //==================================
@@ -1220,73 +1240,73 @@ gridder.setPrefs = function(){
     app.settings.saveSetting("gridderUI", "gridMode", this.gridMode); //RECT, 3D, CIRC
     app.settings.saveSetting("gridderUI", "planeSelect", this.planeSelect);
 
-}
+};
 
 gridder.getPrefs = function(){
     //retrieve
-    if(app.settings.haveSetting("gridderUI", "numRows") == false) this.numRows = 2;
+    if(app.settings.haveSetting("gridderUI", "numRows") === false) this.numRows = 2;
     else this.numRows = app.settings.getSetting("gridderUI", "numRows");
 
-    if(app.settings.haveSetting("gridderUI", "numCols") == false) this.numCols = 2;
+    if(app.settings.haveSetting("gridderUI", "numCols") === false) this.numCols = 2;
     else this.numCols = app.settings.getSetting("gridderUI", "numCols");
 
-    if(app.settings.haveSetting("gridderUI", "numDepth") == false) this.numDepth = 2;
+    if(app.settings.haveSetting("gridderUI", "numDepth") === false) this.numDepth = 2;
     else this.numDepth = app.settings.getSetting("gridderUI", "numDepth");
 
-    if(app.settings.haveSetting("gridderUI", "xSpacing") == false) this.xSpacing = 200;
+    if(app.settings.haveSetting("gridderUI", "xSpacing") === false) this.xSpacing = 200;
     else this.xSpacing = app.settings.getSetting("gridderUI", "xSpacing");
 
-    if(app.settings.haveSetting("gridderUI", "ySpacing") == false) this.ySpacing = 200;
+    if(app.settings.haveSetting("gridderUI", "ySpacing") === false) this.ySpacing = 200;
     else this.ySpacing = app.settings.getSetting("gridderUI", "ySpacing");
 
-    if(app.settings.haveSetting("gridderUI", "zSpacing") == false) this.zSpacing = 200;
+    if(app.settings.haveSetting("gridderUI", "zSpacing") === false) this.zSpacing = 200;
     else this.zSpacing = app.settings.getSetting("gridderUI", "zSpacing");
 
-    if(app.settings.haveSetting("gridderUI", "radius") == false) this.radius = 200;
+    if(app.settings.haveSetting("gridderUI", "radius") === false) this.radius = 200;
     else this.radius = app.settings.getSetting("gridderUI", "radius");
 
-    if(app.settings.haveSetting("gridderUI", "angle") == false) this.angle = 15;
+    if(app.settings.haveSetting("gridderUI", "angle") === false) this.angle = 15;
     else this.angle = app.settings.getSetting("gridderUI", "angle");
 
-    if(app.settings.haveSetting("gridderUI", "rotateAll") == false) this.rotateAll = 0;
+    if(app.settings.haveSetting("gridderUI", "rotateAll") === false) this.rotateAll = 0;
     else this.rotateAll = app.settings.getSetting("gridderUI", "rotateAll");
 
-    if(app.settings.haveSetting("gridderUI", "spiral") == false) this.spiral = 0;
+    if(app.settings.haveSetting("gridderUI", "spiral") === false) this.spiral = 0;
     else this.spiral = app.settings.getSetting("gridderUI", "spiral");
 
-    if(app.settings.haveSetting("gridderUI", "sqGrid") == false) this.sqGrid = true;
+    if(app.settings.haveSetting("gridderUI", "sqGrid") === false) this.sqGrid = true;
     else this.sqGrid = app.settings.getSetting("gridderUI", "sqGrid");
 
-    if(app.settings.haveSetting("gridderUI", "onlyCols") == false) this.onlyCols = true;
+    if(app.settings.haveSetting("gridderUI", "onlyCols") === false) this.onlyCols = true;
     else{
         this.onlyCols = app.settings.getSetting("gridderUI", "onlyCols");
         if(this.onlyCols == "true") this.onlyCols = true;
         else this.onlyCols = false;
     }
 
-    if(app.settings.haveSetting("gridderUI", "onlyRows") == false) this.onlyRows = false;
+    if(app.settings.haveSetting("gridderUI", "onlyRows") === false) this.onlyRows = false;
     else{
         this.onlyRows = app.settings.getSetting("gridderUI", "onlyRows");
         if(this.onlyRows == "true") this.onlyRows = true;
         else this.onlyRows = false;
     }
 
-    if(app.settings.haveSetting("gridderUI", "onlyDepth") == false) this.onlyDepth = false;
+    if(app.settings.haveSetting("gridderUI", "onlyDepth") === false) this.onlyDepth = false;
     else{
         this.onlyDepth = app.settings.getSetting("gridderUI", "onlyDepth");
         if(this.onlyDepth == "true") this.onlyDepth = true;
         else this.onlyDepth = false;
     }
 
-    if(app.settings.haveSetting("gridderUI", "duplicator") == false) this.duplicator = false;
+    if(app.settings.haveSetting("gridderUI", "duplicator") === false) this.duplicator = false;
     else this.duplicator = app.settings.getSetting("gridderUI", "duplicator");
 
-    if(app.settings.haveSetting("gridderUI", "gridMode") == false) this.gridMode = "RECT";
+    if(app.settings.haveSetting("gridderUI", "gridMode") === false) this.gridMode = "RECT";
     else this.gridMode = app.settings.getSetting("gridderUI", "gridMode");
 
-    if(app.settings.haveSetting("gridderUI", "planeSelect") == false) this.planeSelect = 0;
+    if(app.settings.haveSetting("gridderUI", "planeSelect") === false) this.planeSelect = 0;
     else this.planeSelect = app.settings.getSetting("gridderUI", "planeSelect");
-}
+};
 
 //====================================
 //Setting new functions to prototypes
@@ -1332,21 +1352,21 @@ Object.prototype.setFG = function(colorArray) {
         this.graphics.foregroundColor = this.graphics.newPen(this.graphics.PenType.SOLID_COLOR, colorArray, 1);
     }
     return this;
-}
+};
 
 Object.prototype.setBG = function (colorArray) {
     if (typeof colorArray != 'undefined' && colorArray.length >=3) {
         this.graphics.backgroundColor = this.graphics.newBrush(this.graphics.BrushType.SOLID_COLOR, colorArray);
     }
     return this;
-}
+};
 
 Group.prototype.setIcon = function(iconFile) {
     if(iconFile){
         this.icon = this.add("image", undefined, iconFile);
     }
     return this;
-}
+};
 
 Object.prototype.setTip = function(hlpTip) {
     if(hlpTip){
@@ -1354,15 +1374,15 @@ Object.prototype.setTip = function(hlpTip) {
         else this.helpTip = hlpTip;
     }
     return this;
-}
+};
 
 Group.prototype.setState = function(state){
     if(state){
-        this.state = state
+        this.state = state;
     }
     else this.state = false;
-    this.setBG([[.25,.25,.25], [1, 0.58, 0.0]][Number(this.state)])
-}
+    this.setBG([[0.25,0.25,0.25], [1, 0.58, 0.0]][Number(this.state)]);
+};
 
 //==================================
 //Control expressions
@@ -1380,7 +1400,7 @@ gridder.expressions = {
     rot3D: "cntrl = thisComp.layer(" + '"' + this.texts.nullControlName3D + '"' +");\nvalue+[transform.xRotation, transform.yRotation, transform.zRotation] + recursiveRotation(cntrl, cntrl.transform.orientation+[cntrl.transform.xRotation, cntrl.transform.yRotation, cntrl.transform.zRotation])\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\ttry{\n\t\t\treturn recursiveRotation(layer.parent,rot+=([layer.parent.transform.xRotation, layer.parent.transform.yRotation, layer.parent.transform.zRotation]+layer.parent.transform.orientation));\n\t\t}\n\t\tcatch(err){\n\t\t\treturn recursiveRotation(layer.parent,rot+=([0, 0, layer.parent.transform.rotation]));\n\t\t}\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}",
 
     rotCirc: "try{\nc = thisComp.layer(" + '"' + this.texts.nullControlNameCirc + '"' +");\n\nrecursiveRotation(c, c.transform.rotation) + ((c.index-(index-1))*c.effect(2)(1))\n\nfunction recursiveRotation(layer,rot){\n\t//recursive function to calculate true rotation\n\tif(layer.hasParent){\n\t\treturn recursiveRotation(layer.parent,rot+=layer.parent.rotation);\n\t}\n\telse{\n\t\treturn rot;\n\t}\n}\n}catch(err){value}",
-}
+};
 
 //==================================
 //Future - custom effects
@@ -1428,6 +1448,6 @@ gridder.iconsBinaries = ["\u0089PNG\r\n\x1A\n\x00\x00\x00\rIHDR\x00\x00\x00\f\x0
 "\u0089PNG\r\n\x1A\n\x00\x00\x00\rIHDR\x00\x00\x00\x0B\x00\x00\x00\f\b\x06\x00\x00\x00\u00B4\u00A9G\u009E\x00\x00\x00\x19tEXtSoftware\x00Adobe ImageReadyq\u00C9e<\x00\x00\x03fiTXtXML:com.adobe.xmp\x00\x00\x00\x00\x00<?xpacket begin=\"\u00EF\u00BB\u00BF\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.3-c011 66.145661, 2012/02/06-14:56:27        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stRef=\"http://ns.adobe.com/xap/1.0/sType/ResourceRef#\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmpMM:OriginalDocumentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\" xmpMM:DocumentID=\"xmp.did:5DC50212E17811E2896483AB2835CF29\" xmpMM:InstanceID=\"xmp.iid:5DC50211E17811E2896483AB2835CF29\" xmp:CreatorTool=\"Adobe Photoshop CS6 (Windows)\"> <xmpMM:DerivedFrom stRef:instanceID=\"xmp.iid:76DA024754E1E21199638D58CE36839B\" stRef:documentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\"/> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>b\u0094C\u00F3\x00\x00\x00WIDATx\u00DA\u00A4P\u00D1\n\x001\b\u00CA\u00F0\u00FF\x7F\u00B9A\u00B0\u00A3\u0085\u00F5r>:u\x1A\"\u00C2\x1A*\u0081\u00FA@!\u00840&\u00E7\u008B\u00F0\u008ApM\x14\u00C2_5\u00BEt\u00B7\x19Q+\u00A8d\u00F4Q\x15>\u0088\u00A0jqH\u00ED\x03\u00D3\u00C4\u00E6\u00C6\u00B2!\u0093\u00B7\u009E\x0FO\u00F1\u009DMw>\x02\f\x00\u008A\u0092\x18,\f\u00A6\u00F9\x07\x00\x00\x00\x00IEND\u00AEB`\u0082",
 "\u0089PNG\r\n\x1A\n\x00\x00\x00\rIHDR\x00\x00\x00\f\x00\x00\x00\f\b\x06\x00\x00\x00Vu\\\u00E7\x00\x00\x00\x19tEXtSoftware\x00Adobe ImageReadyq\u00C9e<\x00\x00\x03fiTXtXML:com.adobe.xmp\x00\x00\x00\x00\x00<?xpacket begin=\"\u00EF\u00BB\u00BF\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.3-c011 66.145661, 2012/02/06-14:56:27        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stRef=\"http://ns.adobe.com/xap/1.0/sType/ResourceRef#\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmpMM:OriginalDocumentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\" xmpMM:DocumentID=\"xmp.did:5E41D506E17811E29BF4AB5A7FB04209\" xmpMM:InstanceID=\"xmp.iid:5E41D505E17811E29BF4AB5A7FB04209\" xmp:CreatorTool=\"Adobe Photoshop CS6 (Windows)\"> <xmpMM:DerivedFrom stRef:instanceID=\"xmp.iid:76DA024754E1E21199638D58CE36839B\" stRef:documentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\"/> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>v\u00AC0U\x00\x00\x00SIDATx\u00DA\u0094Q\u00CB\n\x00 \f\u00CA\u00D8\u00FF\u00FF\u00B2At\x18\u00A2T\u00C2\x0E\u0085\u00AF\x16H\x0E\u0081^\u00A0\x1F\u00CA\x10\x11\f\u00D0\x054DM\u00D8\u009C2\u0084k%\u00AA\u008B1\u00C0\x19\u00CEP\u0083&i#\t\"\u00EA\u00F2P+\u0080\u00F6\u00FC\u00DD\x12^*\u00E1\u00F7\u00E34:&.\x01\x06\x00w\x1E\x15,\u00DA\u00BA\u00B0\u0089\x00\x00\x00\x00IEND\u00AEB`\u0082",
 "\u0089PNG\r\n\x1A\n\x00\x00\x00\rIHDR\x00\x00\x00\f\x00\x00\x00\f\b\x06\x00\x00\x00Vu\\\u00E7\x00\x00\x00\x19tEXtSoftware\x00Adobe ImageReadyq\u00C9e<\x00\x00\x03fiTXtXML:com.adobe.xmp\x00\x00\x00\x00\x00<?xpacket begin=\"\u00EF\u00BB\u00BF\" id=\"W5M0MpCehiHzreSzNTczkc9d\"?> <x:xmpmeta xmlns:x=\"adobe:ns:meta/\" x:xmptk=\"Adobe XMP Core 5.3-c011 66.145661, 2012/02/06-14:56:27        \"> <rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"> <rdf:Description rdf:about=\"\" xmlns:xmpMM=\"http://ns.adobe.com/xap/1.0/mm/\" xmlns:stRef=\"http://ns.adobe.com/xap/1.0/sType/ResourceRef#\" xmlns:xmp=\"http://ns.adobe.com/xap/1.0/\" xmpMM:OriginalDocumentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\" xmpMM:DocumentID=\"xmp.did:5EC3D82DE17811E28D229197F8AA60FA\" xmpMM:InstanceID=\"xmp.iid:5EC3D82CE17811E28D229197F8AA60FA\" xmp:CreatorTool=\"Adobe Photoshop CS6 (Windows)\"> <xmpMM:DerivedFrom stRef:instanceID=\"xmp.iid:76DA024754E1E21199638D58CE36839B\" stRef:documentID=\"xmp.did:7E1F471DB7DDE2119E70AA3EF412306F\"/> </rdf:Description> </rdf:RDF> </x:xmpmeta> <?xpacket end=\"r\"?>\u00B1\u008D\u00D5*\x00\x00\x00QIDATx\u00DA\u009CQ[\n\x00 \bK\u00F1\u00FEW^\x10\x04\u00B24\u00B3\u00FD\u00A9s\u00F3!\x00\x06\u0081\x13\u00E2\x03\x0B\u0088\u0092\b\u0088o@@d\u0087\u00C5\u00D1\u00D1\u0084\x16\u00EA\u00EC\x04K\u008A\u00B89\u00B4`\u00C5\u00A2\u0087\u00B3\u00EE\u00D9\x1E\u00C4\u00FF\u00AEd\u00FE\x02\u009D\u00C7\u00F1\u0083\u00D2}\u00A6\x00\x03\x00\u00C7\u00F5\x11#=S)(\x00\x00\x00\x00IEND\u00AEB`\u0082",
-]
+];
 
 gridder.buildGUI(gridder);
